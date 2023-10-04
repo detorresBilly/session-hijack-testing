@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="UTF-8">
+        <title>User</title>
+        <style>
+            body {
+                font-family:'Roboto', sans-serif;
+            }
+            .container {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100%; 
+            }
+
+            #post-list {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            }
+
+            .post {
+            border: 1px solid #ccc;
+            width: 350px;
+            padding: 10px;
+            margin-bottom: 10px;
+            }
+
+            .author {
+            font-weight: bold;
+            }
+
+            .date {
+            color: #777;
+            font-size: 0.8em;
+            }
+
+            .content {
+            margin-top: 10px;
+            }
+
+            
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div>
+                <h1 id="user-header">Logged in as:</h1>
+                <form action="/logout" method="get">
+                    <input type="hidden" name="logout" value="true">
+                    <button type="submit">Logout</button>
+                </form>  
+            </div>        
+            <h3>Make Post:</h3>
+            <form action="/api/posts" method="post">
+                <textarea id="postbody" name="postbody" rows="4" cols="50" required></textarea>
+                <input type="submit" value="Post">
+            </form>
+            <h3>Posts:</h3>
+            <ul id="post-list">
+
+            </ul>
+            <script src="user.js"></script>
+        </div>
+      </body>
+</html>
