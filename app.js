@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const requestLoggerMiddleware = require('./requestLogger');
-const cookieValidationMiddleware = require('./cookieValidation');
+const middleware = require('./middleware');
 const userModel = require('./mongo/userModel');
 const postModel = require('./mongo/postModel');
 
@@ -11,8 +10,8 @@ const port = 3000;
 let sessionId = 1000000000 + Math.floor(Math.random() * 8999999999);
 
 const app = express();
-const cookieValidation = cookieValidationMiddleware();
-const requestLogger = requestLoggerMiddleware(10, 10000, 'file.LOG', false);
+const cookieValidation = middleware.createValidateCookieMiddleware(5, 100000, 'file.LOG', false);
+const requestLogger = middleware.createRequestLoggerMiddleware(10, 10000, 'file.LOG', false);
 
 app.use(express.static('public', { 'extensions': ['js', 'css', 'ico'] }));
 app.use(express.json());
