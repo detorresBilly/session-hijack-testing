@@ -1,56 +1,56 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <style>
-        body {
-            font-family:'Roboto', sans-serif;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <style>
+            body {
+                font-family:'Roboto', sans-serif;
+            }
 
-        .container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
+            .container {
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+            }
 
-        label {
-            margin: 5px 0;
-            width: 100px; 
-            display: inline-block;
-        }
-        
-        input {
-            margin: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Session Hijacking Example</h1>
-        <h2>Login</h2>
-        <form action="/login" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <br>
-            <input type="submit" value="Login">
-        </form>
-        <h2>Create Acc</h2>
-        <form action="/createAcc" method="post">
-            <label for="username" >Username:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <br>
-            <input type="submit" value="Create Account">
-        </form>
-    </div>
-</body>
+            label {
+                margin: 5px 0;
+                width: 100px; 
+                display: inline-block;
+            }
+            
+            input {
+                margin: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Session Hijacking Example</h1>
+            <h2>Login</h2>
+            <form action="/login" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <br>
+                <input type="submit" value="Login">
+            </form>
+            <h2>Create Acc</h2>
+            <form action="/createAcc" method="post">
+                <label for="username" >Username:</label>
+                <input type="text" id="username" name="username" required>
+                <br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <br>
+                <input type="submit" value="Create Account">
+            </form>
+        </div>
+    </body>
 </html>

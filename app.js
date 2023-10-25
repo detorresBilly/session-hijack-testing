@@ -1,18 +1,24 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const requestLoggerMiddleware = require('./requestLogger');
+const cookieValidationMiddleware = require('./cookieValidation');
 const userModel = require('./mongo/userModel');
-const postModel = require('./mongo/postModel')
+const postModel = require('./mongo/postModel');
+
 
 const port = 3000;
 let sessionId = 1000000000 + Math.floor(Math.random() * 8999999999);
 
 const app = express();
+const cookieValidation = cookieValidationMiddleware();
+const requestLogger = requestLoggerMiddleware(10, 10000, 'file.LOG', false);
 
-app.use(express.static('public', { 'extensions': ['html', 'js', 'css'] }));
+app.use(express.static('public', { 'extensions': ['js', 'css', 'ico'] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
@@ -24,37 +30,27 @@ async function logoutUser(userId) {
     await user.save();
 }
 
-async function generateSessionCookie(userId) {
+async function generateSessionCookie(req, userId) {
     const user = await userModel.findOne({userId: userId});
     const newSessionId = (sessionId++) + '-' + userId;
     user.sessionId = newSessionId;
+    user.ipAddress = req.ip;
+    user.userAgent = req.get("User-Agent");
     await user.save();
     return newSessionId;
 }
 
-async function validateCookie(req, res, next) {
-    if(!req) res.redirect('/login');
-    const { cookies } = req;
-    if('session_id' in cookies) {
-        const user = await userModel.exists({sessionId : cookies.session_id});
-        if(user) {
-            next();
-        } else res.redirect('/login');
-    }
-    else res.redirect('/login');
-}
-
-app.get('/', validateCookie, (req, res) => {
+app.get('/', cookieValidation, (req, res) => {
     res.sendFile(__dirname + '/public/user.html');
 });
 
-app.get('/api/user', validateCookie, async (req, res) => {
+app.get('/api/user', cookieValidation, async (req, res) => {
     const { cookies } = req;
     user = await userModel.findOne({sessionId : cookies.session_id});
     res.json(user);
 });
 
-app.post('/api/posts', validateCookie, async (req, res) => {
+app.post('/api/posts', cookieValidation, async (req, res) => {
     const { cookies } = req;
     user = await userModel.findOne({sessionId : cookies.session_id});
     const { postbody } = req.body;
@@ -71,15 +67,16 @@ app.post('/api/posts', validateCookie, async (req, res) => {
     }
 });
 
-app.get('/api/posts', validateCookie, async (req, res) => {
+app.get('/api/posts', cookieValidation, async (req, res) => {
     posts = await postModel.find();
     res.json(posts);
 });
 
 
-app.get('/logout', validateCookie, async (req, res) => {
+app.get('/logout', cookieValidation, async (req, res) => {
     const { cookies } = req;
     await logoutUser(cookies.session_id.split('-')[1]);
+    res.clearCookie('session_id');
     res.redirect('../');
 });
 
@@ -88,9 +85,11 @@ app.post('/login', async (req, res) => {
     if(await userModel.exists({name: username})) {
         const user = await userModel.findOne({name: username});
         if(user.password == password) {
-            const sessionId = await generateSessionCookie(user.userId);
+            const sessionId = await generateSessionCookie(req, user.userId);
             res.cookie('session_id', sessionId);
             res.redirect('../');
+        } else {
+            res.send('<p>wrong password</p><a href="/login">back</a>')
         }
     } else {
         res.send('<p>user does not exist</p><a href="/login">back</a>')
@@ -115,7 +114,7 @@ app.post('/createAcc', async (req, res) => {
                 password: password,
                 userId: (highestId + 1)
             });
-            const sessionId = await generateSessionCookie((highestId + 1));
+            const sessionId = await generateSessionCookie(req, (highestId + 1));
             res.cookie('session_id', sessionId);
             res.redirect('../');
         } catch(err) {
